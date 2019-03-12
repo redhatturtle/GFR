@@ -79,10 +79,18 @@ make install
 # Building Parallel CGNS
 # ======================
 
-wget https://github.com/CGNS/CGNS/archive/v3.3.0.tar.gz -O ${gfrdir}/tpl/CGNS-3.3.0.tar.gz
+wget https://github.com/CGNS/CGNS/archive/v4.3.0.tar.gz -O ${gfrdir}/tpl/CGNS-3.3.0.tar.gz
 tar -xzvf ${gfrdir}/tpl/CGNS-3.3.0.tar.gz -C ${gfrdir}/tpl/
 cd ${gfrdir}/build/cgns
-cmake -D CGNS_ENABLE_FORTRAN:BOOL=ON -D CGNS_ENABLE_HDF5:BOOL=ON -D CGNS_ENABLE_PARALLEL:BOOL=ON -D CMAKE_C_COMPILER:STRING=mpicc -D CMAKE_Fortran_COMPILER:STRING=mpif90 -D CMAKE_INSTALL_PREFIX:PATH=${gfrdir}/build -D HDF5_IS_PARALLEL:BOOL=ON  -D HDF5_NEED_MPI:BOOL=ON ${gfrdir}/tpl/CGNS-3.3.0
+cmake -D CGNS_ENABLE_FORTRAN:BOOL=ON \
+      -D CGNS_ENABLE_HDF5:BOOL=ON \
+      -D CGNS_ENABLE_PARALLEL:BOOL=ON \
+      -D CMAKE_C_COMPILER:STRING=mpicc \
+      -D CMAKE_Fortran_COMPILER:STRING=mpif90 \
+      -D CMAKE_INSTALL_PREFIX:PATH=${gfrdir}/build \
+      -D HDF5_IS_PARALLEL:BOOL=ON \
+      -D HDF5_NEED_MPI:BOOL=ON \
+  ${gfrdir}/tpl/CGNS-3.3.0
 make -j
 sudo make install
 
