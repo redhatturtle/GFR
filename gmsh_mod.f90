@@ -1261,6 +1261,7 @@ subroutine create_solver_geom_arrays_gmsh
   use geovar, only : nr,ncell,nnode,nfbnd,nbfai,bface
   use geovar, only : nodes_of_cell_ptr,nodes_of_cell
   use geovar, only : cell_geom,cell_order,xyz_nodes
+  use ovar,   only : bc_names
   use ovar,   only : loc_solution_pts,loc_flux_pts
   !
   !.. Local Scalars ..
@@ -1831,6 +1832,9 @@ continue
  !  end do
  !end do
   !
+  allocate ( bc_names(1:size(bnd_grps)) , stat=ierr , errmsg=error_message )
+  call alloc_error(pname,"bc_names",1,__LINE__,__FILE__,ierr,error_message)
+  !
   ! Allocate the bface array
   !
   allocate ( bface(1:nbfai,1:nfbnd) , source=0 , &
@@ -1844,6 +1848,8 @@ continue
   boundary_phys_grps: do i = 1,size(bnd_grps)
     !
     np = bnd_grps(i)
+    !
+    bc_names(i) = trim(adjustl(phys_grps(np)%phys_nam))
     !
     current_phys_grp: do j = 1,size(phys_grps(np)%cells)
       !
@@ -2005,7 +2011,7 @@ continue
  !end if
   !
   if (loc_solution_pts /= Legendre_Gauss_Lobatto .or. &
-      loc_flux_pts /= Legendre_Gauss_Lobatto) then
+          loc_flux_pts /= Legendre_Gauss_Lobatto) then
     if (any(cell_geom == Geom_Tria)) then
       if (mypnum == 0) write (iout,7)
       call stop_gfr(stop_mpi,pname,__LINE__,__FILE__)
