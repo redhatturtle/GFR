@@ -221,6 +221,7 @@ $(OBJDIR)/initialize.o : initialize.f90 \
                $(OBJDIR)/interpolation_mod.o \
                $(OBJDIR)/derivatives_mod.o \
                $(FUNDIR)/vortex.f90 \
+               $(FUNDIR)/ringleb.f90 \
                $(FUNDIR)/taylor_green.f90 \
                $(FUNDIR)/smc000_interior_wall_radius.f90 \
                $(FUNDIR)/arn2_interior_wall_radius.f90 \

@@ -473,6 +473,7 @@ module module_kind_types
   integer, parameter :: Double_Mach_Reflection  = 11
   integer, parameter :: Infinite_Cylinder       = 12
   integer, parameter :: Freestream_Preservation = 13
+  integer, parameter :: Ringleb_Flow            = 14
   integer, parameter :: Advec_Problems(1:2) = [ Density_Transport, &
                                                 Entropy_Transport ]
   integer, parameter :: Vortex_Problems(1:2) = [ Shu_Vortex, &

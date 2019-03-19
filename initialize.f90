@@ -518,6 +518,12 @@ continue
       return_value(:,k) = initialize_cylinder(xyz(:,k),bc_in(0)%pv(:))
     end do
     !
+  else if (itestcase == Ringleb_Flow) then
+    !
+    do k = 1,np
+      return_value(:,k) = ringleb_solution( xyz(:,k) )
+    end do
+    !
   else
     !
     do k = 1,np
@@ -2596,6 +2602,7 @@ end subroutine igl
 !###############################################################################
 !
 include "Functions/vortex.f90"
+include "Functions/ringleb.f90"
 include "Functions/taylor_green.f90"
 include "Functions/usp2v.f90"
 include "Functions/vsp2u.f90"
