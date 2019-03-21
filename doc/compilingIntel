@@ -38,7 +38,7 @@ tar -xzvf ${gfrdir}/tpl/metis-5.1.0.tar.gz -C ${gfrdir}/tpl/
 cp -rp ${gfrdir}/tpl/metis-5.1.0 ${gfrdir}/build/metis
 cd ${gfrdir}/build/metis
 make cc=icc prefix=${gfrdir}/build config
-make
+make -j
 make install
 
 ################################################################################
@@ -57,7 +57,7 @@ wget http://www.mpich.org/static/downloads/3.2/mpich-3.2.tar.gz -O ${gfrdir}/tpl
 tar -xzvf ${gfrdir}/tpl/mpich-3.2.tar.gz -C ${gfrdir}/tpl/
 cd ${gfrdir}/build/mpi
 env CC=icc FC=ifort ${gfrdir}/tpl/mpich-3.2/configure --prefix=${gfrdir}/build --enable-fortran=all
-make
+make -j
 make install
 
 export PATH=${gfrdir}/build/bin:${PATH}
@@ -71,7 +71,7 @@ wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.19/src/hdf
 tar -xzvf ${gfrdir}/tpl/hdf5-1.8.19.tar.gz -C ${gfrdir}/tpl/
 cd ${gfrdir}/build/hdf5
 env CC=mpicc ${gfrdir}/tpl/hdf5-1.8.19/configure --prefix=${gfrdir}/build --enable-parallel
-make
+make -j
 make install
 
 ################################################################################
@@ -82,17 +82,9 @@ make install
 wget https://github.com/CGNS/CGNS/archive/v3.3.0.tar.gz -O ${gfrdir}/tpl/CGNS-3.3.0.tar.gz
 tar -xzvf ${gfrdir}/tpl/CGNS-3.3.0.tar.gz -C ${gfrdir}/tpl/
 cd ${gfrdir}/build/cgns
-cmake -D CGNS_ENABLE_FORTRAN:BOOL=ON \
-      -D CGNS_ENABLE_HDF5:BOOL=ON \
-      -D CGNS_ENABLE_PARALLEL:BOOL=ON \
-      -D CMAKE_C_COMPILER:STRING=mpicc \
-      -D CMAKE_Fortran_COMPILER:STRING=mpif90 \
-      -D CMAKE_INSTALL_PREFIX:PATH=${gfrdir}/build \
-      -D HDF5_IS_PARALLEL:BOOL=ON \
-      -D HDF5_NEED_MPI:BOOL=ON \
-  ${gfrdir}/tpl/CGNS-3.3.0
-make
-make install
+cmake -D CGNS_ENABLE_FORTRAN:BOOL=ON -D CGNS_ENABLE_HDF5:BOOL=ON -D CGNS_ENABLE_PARALLEL:BOOL=ON -D CMAKE_C_COMPILER:STRING=mpicc -D CMAKE_Fortran_COMPILER:STRING=mpif90 -D CMAKE_INSTALL_PREFIX:PATH=${gfrdir}/build -D HDF5_IS_PARALLEL:BOOL=ON  -D HDF5_NEED_MPI:BOOL=ON ${gfrdir}/tpl/CGNS-3.3.0
+make -j
+sudo make install
 
 ################################################################################
 ################################################################################
