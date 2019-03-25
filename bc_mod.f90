@@ -245,6 +245,15 @@ continue
                                            facexyz(nf)%v(:,:), &
                                            geofa(nf)%v(:,:))
         !
+      case (bc_ringleb_dirichlet)
+        !
+        ! Dirichlet boundary condition for Ringleb Flow
+        !
+        call get_bc_ringleb_dirichlet_solution(faceusp(nf)%v(:,:,1), &
+                                               faceusp(nf)%v(:,:,2), &
+                                               facexyz(nf)%v(:,:), &
+                                               geofa(nf)%v(:,:))
+        !
       case (bc_cpu_bnd)
         !
         ! We dont need to do anything here for communication boundaries
@@ -2096,6 +2105,126 @@ continue
 end subroutine get_bc_mms_dirichlet_solution
 !
 !###############################################################################
+!
+subroutine get_bc_ringleb_dirichlet_solution(hufp,gufp,fxyz,fnrm)
+  !
+  ! #########################################################
+  ! #########################################################
+  ! ##  MMS Dirichlet (generic freeflow) Boundary Condition
+  ! ##    - At each flux point, use the normal velocity
+  ! ##      Mach number to determine if it is an inflow
+  ! ##      or outflow boundary condition and whether
+  ! ##      it is subsonic or supersonic.
+  ! #########################################################
+  ! #########################################################
+  !
+  ! GUFP : Conservative variables at the ghost cell flux points
+  ! HUFP : Conservative variables at the host  cell flux points
+  ! FXYZ : Coordinates of the flux points
+  ! FNRM : Face outward normal vector at the flux points
+  !
+  !.. Use Statements ..
+  !
+  !.. Formal Arguments ..
+  real(wp),    intent(in) :: hufp(:,:)
+  real(wp),    intent(in) :: fxyz(:,:)
+  real(wp),    intent(in) :: fnrm(:,:)
+  real(wp), intent(inout) :: gufp(:,:)
+  !
+  !.. Local Scalars ..
+  integer  :: nr, k
+  real(wp) :: gm1, ske_inf, ske_int, mach_int, aspd_int
+  !
+  !.. Local Arrays ..
+  real(wp) :: rnrm(1:size(fnrm,dim=1))
+  real(wp) :: hvfp(1:size(gufp,dim=1))
+  real(wp) :: ringleb_sol(1:size(gufp,dim=1))
+  !
+continue
+  !
+  nr = size(fnrm,dim=1)
+  !
+  gm1 = gam - one
+  !
+  ! Loop through the FPs
+  !
+  do k = 1,size(gufp,dim=2)
+    !
+    ! Get the analytical solution for the Ringleb flow problem
+    !
+    ringleb_sol(1:nq) = ringleb_solution( fxyz(:,k) )
+    !
+    ! Unit normal and tangent at this flux point
+    !
+    rnrm(:) = unit_vector( fnrm(:,k) )
+    !
+    ! Get the host cell primitive variables at this flux point
+    !
+    hvfp(:) = usp2v_sp( hufp(:,k) )
+    !
+    ! Compute the speed of sound at this flux point
+    !
+    aspd_int = sqrt( max( gam*hvfp(nee)/hvfp(nec) , rndoff ) )
+    !
+    ! Compute the Mach number of the normal velocity at this flux point
+    !
+    mach_int = dot( hvfp(nmb:nme) , rnrm(1:nr) ) / aspd_int
+    !
+    if (mach_int >= one) then
+      !
+      ! Supersonic outflow
+      !
+      ! Extrapolate all interior variables to the boundary
+      !
+      gufp(1:nq,k) = hufp(1:nq,k)
+      !
+    else if (mach_int <= -one) then
+      !
+      ! Supersonic inflow
+      !
+      ! Set all variables to free stream
+      !
+      gufp(:,k) = ringleb_sol(1:nq)
+      !
+    else if (mach_int > -one .and. mach_int <= zero) then
+      !
+      ! Subsonic inflow
+      !
+      ! Set all variables but pressure to free stream
+      !
+      gufp(:,k) = ringleb_sol(:)
+      !
+      ! Compute the total energy using interior pressure
+      ! and free stream specific kinetic energy
+      !
+      ske_inf = half * selfdot( ringleb_sol(nmb:nme) ) / ringleb_sol(nec)
+      !
+      gufp(nee,k) = hvfp(nee)/gm1 + ske_inf
+      !
+    else if (mach_int < one .and. mach_int > zero) then
+      !
+      ! Subsonic outflow
+      !
+      ! Extrapolate interior density and velocities to boundary
+      !
+      gufp(:,k) = hufp(:,k)
+      !
+      ! Compute the interior specific kinetic energy
+      !
+      ske_int = half * selfdot( hufp(nmb:nme,k) ) / hufp(nec,k)
+      !
+      ! Compute the total energy using free stream pressure
+      ! and interior specific kinetic energy
+      !
+      gufp(nee,k) = pressure_cv_sp( ringleb_sol(1:nq) )/gm1 + ske_int
+      !
+    end if
+    !
+  end do
+  !
+end subroutine get_bc_ringleb_dirichlet_solution
+!
+!###############################################################################
 !###############################################################################
 !###############################################################################
 !###############################################################################
@@ -2855,6 +2984,7 @@ end subroutine exchange_bc_conflicts_dusp
 !
 !###############################################################################
 !
+include "Functions/ringleb.f90"
 include "Functions/temperature.f90"
 include "Functions/pressure.f90"
 include "Functions/usp2v.f90"

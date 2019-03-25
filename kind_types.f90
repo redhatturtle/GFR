@@ -424,6 +424,8 @@ module module_kind_types
   integer, parameter :: bc_default_wall = bc_adiabatic_wall
   ! MMS BCs
   integer, parameter :: bc_mms_dirichlet = 70
+  ! Ringleb BCs
+  integer, parameter :: bc_ringleb_dirichlet = 71
   ! Other BCs
   integer, parameter :: not_a_bc = 0
   integer, parameter :: bc_symmetry = 80

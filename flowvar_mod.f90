@@ -1,5 +1,6 @@
 module flowvar
   !
+  use module_kind_types, only : Ringleb_flow
   use module_kind_types, only : wp,lk
   use module_kind_types, only : zero,iout
   use module_kind_types, only : true,fals
@@ -191,6 +192,7 @@ subroutine allocate_flowvar_arrays()
   use geovar,    only : nfbnd,nface,face
   use geovar,    only : nnode,nedge,edge
   use order_mod, only : geom_solpts
+  use ovar,      only : itestcase
   use ovar,      only : Runge_Kutta_Scheme,num_rk_stages,mms_opt
   use ovar,      only : convert_restart_to_cgns
   use ovar,      only : continuous_output
@@ -261,7 +263,7 @@ continue
       allocate ( facexyz(1:nface) , stat=ierr , errmsg=error_message )
       call alloc_error(pname,"facexyz",1,__LINE__,__FILE__,ierr,error_message)
       !
-    else if (mms_opt /= 0) then
+    else if (mms_opt /= 0 .or. itestcase == Ringleb_Flow) then
       !
       ! If using MMS but not using continuous output, facexyz only needs
       ! to be defined for the boundary faces

@@ -47,6 +47,8 @@ continue
       return_value = "periodic"
     case (bc_mms_dirichlet)
       return_value = "MMS_dirichlet"
+    case (bc_ringleb_dirichlet)
+      return_value = "Ringleb_dirichlet"
     case (bc_cpu_bnd)
       return_value = "cpu_bnd"
     case (bc_unknown)
