@@ -233,9 +233,8 @@ module ovar
   integer,     public, save :: VortexGrid_perturb_percent = 30
   !
   ! RINGLEB FLOW CONSTANTS
-  real(wp), public, save :: ringleb_q0   = 0.5_wp
-  real(wp), public, save :: ringleb_kmin = 0.7_wp
-  real(wp), public, save :: ringleb_kmax = 1.5_wp
+  real(wp), public, save :: ringleb_qmin = eps6
+  real(wp), public, save :: ringleb_kmax = 1.51_wp
   !
   ! CHANNEL FLOW PARAMETERS
   real(wp),           public, save :: channel_body_force = 0.0_wp
@@ -632,7 +631,7 @@ module input_namelist_mod
   use ovar,      only : use_unrolled_dot_products
   use ovar,      only : VortexGrid_DOF,VortexGrid_random_perturb
   use ovar,      only : VortexGrid_perturb_percent,VortexGrid_Lref
-  use ovar,      only : ringleb_q0, ringleb_kmin, ringleb_kmax
+  use ovar,      only : ringleb_qmin, ringleb_kmax
   use ovar,      only : channel_body_force,channel_init_file
   use ovar,      only : convert_restart_to_cgns, completely_disable_cgns
   use ovar,      only : lustre_stripe_count, lustre_stripe_size
@@ -735,7 +734,7 @@ module input_namelist_mod
   namelist / input / VortexGrid_DOF, VortexGrid_random_perturb, &
                      VortexGrid_perturb_percent
   ! RINGLEB FLOW CONSTANTS
-  namelist / input / ringleb_q0, ringleb_kmin, ringleb_kmax
+  namelist / input / ringleb_qmin, ringleb_kmax
   ! CHANNEL FLOW PARAMETERS
   namelist / input / channel_body_force, channel_init_file
   ! OPTIONS FOR MODIFYING BC ALGORITMS

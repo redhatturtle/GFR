@@ -3,7 +3,7 @@ pure function ringleb_solution(xyz) result(return_value)
   !.. Use Statements ..
   use ovar, only : velref, aref, uref, machref
   use ovar, only : gam, rhoref, tref, pref, itestcase
-  use ovar, only : ringleb_q0, ringleb_kmin, ringleb_kmax
+  use ovar, only : ringleb_qmin, ringleb_kmax
   !
   !.. Formal Arguments ..
   real(wp), dimension(:), intent(in) :: xyz
@@ -33,7 +33,7 @@ continue
   rhoa  = rhoref * aref
   rhoa2 = rhoa * aref
   !
-  Vmin = ringleb_q0
+  Vmin = ringleb_qmin
   Vmax = ringleb_kmax
   q    = v_from_xy_bisec( xyz(1), xyz(2), Vmin, Vmax )
   !
