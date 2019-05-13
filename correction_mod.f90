@@ -221,7 +221,7 @@ pure function CorrectionMatrix_Edge(xi,eval_deriv) result(return_value)
   !.. Local Scalars ..
   integer  :: n,k,j,npts,ndeg
   logical(lk) :: compute_derivative
-  real(qp) :: cn,cnm1,cnm2
+  real(qp) :: cn,cnm1,cnm2,den
   !
   !.. Local Arrays ..
   real(qp), dimension(1:size(xi)) :: x
@@ -315,9 +315,17 @@ continue
   !
   ! Get the coefficients for the correction function
   !
-  if (correction_function == Correction_g2) then
+  if (correction_function == Correction_gDG) then
     !
-    ! Use the g2 correction function
+    ! Use DG correction function
+    !
+    do j = 0,ndeg
+      coef_c(j) = coef_RR(j,ndeg)
+    end do
+    !
+  else if (correction_function == Correction_g2) then
+    !
+    ! Use the G_2 correction function
     !
     cn   = real( ndeg-1 , kind=qp ) / real( 2*ndeg-1 , kind=qp )
     cnm1 = real( ndeg   , kind=qp ) / real( 2*ndeg-1 , kind=qp )
@@ -330,16 +338,35 @@ continue
     !
     ! Use the gGauss correction function
     !
-    cn   = real( ndeg-1 , kind=qp ) / real( 2*ndeg-1 , kind=qp )
-    cnm1 = real( ndeg   , kind=qp ) / real( 2*ndeg-1 , kind=qp )
+    ! The gGauss correction function is defined by having the same roots as the
+    ! (n-1)th order Legendre polynomial plus a root at x=+1
     !
+    ! Multiply the (n-1)th Legendre polynomial by (x-1)
     do j = 0,ndeg
-      coef_c(j) = cn*coef_RR(j,ndeg) + cnm1*coef_RR(j,ndeg-1)
+      coef_c(j) = coef_Le(j-1,ndeg-1) - coef_Le(j,ndeg-1)
     end do
+    !
+    ! Calculate the denominator to normalize the correction function at x=-1
+    den = -qtwo*(sum( coef_Le(0:ndeg-1:2, ndeg-1) ) - sum( coef_le(1:ndeg-1:2, ndeg-1) ) )
+    !
+    coef_c(:) = coef_c(:)/den
+    !
+  !else if (correction_function == Correction_gCheLob) then
+    !
+    ! Use the Lumped Chebyshev-Lobatto points correction function
+    !
+  !else if (correction_function == Correction_gSG) then
+    !
+    ! Use the Staggered Grid (or Spectral Difference) correction function
+    !
+  !else if (correction_function == Correction_g3) then
+    !
+    ! Use the G_3 correction function
     !
   else
     !
     ! Use the right Radau polynomial for the correction function
+    ! Use DG correction function
     !
     do j = 0,ndeg
       coef_c(j) = coef_RR(j,ndeg)
@@ -664,9 +691,9 @@ continue
   !
   ! DG Book's method for getting Fmask
   !
- !Fmask(:,1) = pack( (/(i,i=1,nsp)/) , abs(rs(2,:) + one    ) < eps12 )
- !Fmask(:,2) = pack( (/(i,i=1,nsp)/) , abs(rs(1,:) + rs(2,:)) < eps12 )
- !Fmask(:,3) = pack( (/(i,i=1,nsp)/) , abs(rs(1,:) + one    ) < eps12 )
+  !Fmask(:,1) = pack( (/(i,i=1,nsp)/) , abs(rs(2,:) + one    ) < eps12 )
+  !Fmask(:,2) = pack( (/(i,i=1,nsp)/) , abs(rs(1,:) + rs(2,:)) < eps12 )
+  !Fmask(:,3) = pack( (/(i,i=1,nsp)/) , abs(rs(1,:) + one    ) < eps12 )
   !
   ! Compute the inverse mass matrix along an edge
   !

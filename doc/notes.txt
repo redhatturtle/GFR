@@ -293,12 +293,12 @@
      faces.
    - If the cell_idx array is removed, the left/right components of face_t
      will probably have to be changed to face(:)%side(1/2) because the value
-     of 1 or 2 stored in cell(:)%face(:)%side doesnt point us to the flxpts
+     of 1 or 2 stored in cell(:)%face(:)%side doesn't point us to the flxpts
      component of the face array without the use of costly conditional
      statements.
    - The flxpts array could be removed since the value stored in
      face(:)%left/right%cell_face points us to the correct array element of
-     cell(:)%face. 
+     cell(:)%face.
    - However, Im hesitant to make any changes because Im not sure of its affect
      on performance since the code will have to jump deep into a specific part
      of the cell(:) array while using the face(:) array.  The current setup
@@ -358,7 +358,7 @@
      rates for the Taylor-Green vortex problem due to insufficient quadrature.
 
 * Figure out way to add the mycpu.c and cpu_info_mod.f90 files so that the
-  code works for both NAS and on a local machine that doesnt have the
+  code works for both NAS and on a local machine that doesn't have the
   sched_getcpu function available.
 
 * Finish the subroutine check_quality_of_partitioning so it checks that all
@@ -402,7 +402,7 @@
 
 * Create functions that given an input of the number of solution points for a
   geometry type, it returns the number of flux points for that geometry type.
-   
+
 * Create functions that given an input of the number of solution points for a
   geometry type, it returns the solution order.
    - The functions have been created, they just need to be applied throughout
@@ -414,6 +414,7 @@
   the nodes (0,0)-(+1,0)-(0,+1).
    - This applies to tets, pyramids, and prisms as well through their triangle
      faces and any tensor products used to create their mappings.
+   - DONE ALREADY???
 
 ################################################################################
 ################################################################################
@@ -427,6 +428,17 @@
 
 * Need to add additional correction functions besides just the DG correction
   function.
+  STABLE SCHEMES:
+  - DG (G_1)         DONE for edge
+  - G_2 (lump,Lo)    DONE for egde
+  - G_ga             DONE for edge, needs testing
+  - G_lump,che-lob
+  MILDLY UNSTABLE SCHEMES
+  - SG
+  - G_3
+  UNSTABLE SCHEMES
+  - G_4
+  - G_lob
 
 * Need to look into finishing the limiting and over-integration parts of the
   code. Really need to figure out how to mark troubled cells so that these

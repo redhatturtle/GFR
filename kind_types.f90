@@ -511,6 +511,9 @@ module module_kind_types
   integer, parameter :: Correction_gDG = 1
   integer, parameter :: Correction_g2 = 2
   integer, parameter :: Correction_gGauss = 3
+  !integer, parameter :: Correction_gCheLob = 4   ! Not implemented
+  !integer, parameter :: Correction_gSG = 5       ! Not implemented
+  !integer, parameter :: Correction_g3 = 6        ! Not implemented
   !
   integer, parameter :: project_derivatives = 1
   integer, parameter :: derivative_of_proj_fluxes = 2
