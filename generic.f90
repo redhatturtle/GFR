@@ -120,16 +120,24 @@ continue
       !
       ! Error for conserved variables at the current solution point
       !
+      ett(1:nq,1) = abs( unew(:,k) - uold(:,k) )
+      !
       if (itestcase == Inviscid_Gaussian_Bump) then
         sn = entropy_cv_sp( unew(:,k) , log_opt=fals , use_pref_nd=true )
         se = one
+        !
+        ett(nq+1,1) = sn - se
+      else if (itestcase == Ringleb_Flow) then
+        sn = entropy_cv_sp( unew(:,k), log_opt=fals, use_pref_nd=true)
+        se = entropy_cv_sp( uold(:,k), log_opt=fals, use_pref_nd=true)
+        !
+        ett(nq+1,1) = abs(sn - se)
       else
         sn = entropy_cv_sp( unew(:,k) )
         se = entropy_cv_sp( uold(:,k) )
+        !
+        ett(nq+1,1) = sn - se
       end if
-      !
-      ett(1:nq,1) = abs( unew(:,k) - uold(:,k) )
-      ett(nq+1,1) = sn - se
       !
       ! Error for primitive variables at the current solution point
       !
@@ -779,6 +787,18 @@ continue
     !
     do k = 1,nep
       uold(1:nq,k) = vortex_solution( xyz_offset(1:nr,k) )
+    end do
+    !
+    if (present(vold)) then
+      vold(1:nq,1:nep) = usp2v( uold(1:nq,1:nep) , swap_t_for_rho=true )
+    end if
+    !
+  else if (itestcase == Ringleb_Flow) then
+    !
+    ! Evaluate the exact analytical solution to the Ringleb Flow problem
+    !
+    do k = 1,nep
+      uold(1:nq,k) = ringleb_solution( xyz_err(1:nr,k) )
     end do
     !
     if (present(vold)) then
@@ -1454,6 +1474,7 @@ include "Functions/usp2v.f90"
 include "Functions/entropy.f90"
 include "Functions/pressure.f90"
 include "Functions/vortex.f90"
+include "Functions/ringleb.f90"
 include "Functions/grad_cv_to_grad_pv.f90"
 !
 !###############################################################################
